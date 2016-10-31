@@ -9,6 +9,7 @@ import numpy as np
 from numpy import cos, sin
 import baxter_link
 from baxter_link import Baxter_Test
+import baxter_sim
 
 PI = np.pi
 g = 9.81

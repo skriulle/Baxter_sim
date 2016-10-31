@@ -3,6 +3,7 @@
 import numpy as np
 from numpy import cos, sin
 
+PI = np.pi
 
 class Baxter_Link:
     
@@ -32,7 +33,7 @@ class Baxter_Link:
         res += '\n]'
         return res
         
-    def get_T_Matrix(self, theta):
+    def get_T_Matrix(self, theta=0):
         #This function of object L(i) returns transform matrix ^(i-1)T_(i)
         d, a, alfa, m = self.d, self.a, self.alfa, self.m
         return np.matrix([
@@ -42,7 +43,7 @@ class Baxter_Link:
             [         0,                     0,                     0,            1]
         ])
 
-    def Jacobian(self):
+    def J(self):
         xx, yy, zz, xy, yz, xz = self.__inertias
         d, a, alfa, m = self.d, self.a, self.alfa, self.m
         x, y, z = self.com
@@ -52,6 +53,16 @@ class Baxter_Link:
             [           xz,           yz, (+xx+yy-zz)/2, m*z],
             [           mx,           my,            mz,   m]
         ])
+
+    def Q():
+        return np.matrix([
+            [ 0, -1, 0, 0],
+            [ 1,  0, 0, 0],
+            [ 0,  0, 0, 0],
+            [ 0,  0, 0, 0]
+        ])
+
+        
 
 
 class Baxter_Test():
@@ -94,6 +105,7 @@ class Baxter_Test():
                            [0.2295, 0, 0, 0.54218]
             )
         }
+
 
 """
 
