@@ -11,7 +11,8 @@ class Baxter_Link:
         self.num = num
         self.__intertias = inertias
         #__inertias has 6 values of inertias of the link(xx, yy, zz, xy, yz, xz)
-        self.com = com
+        com.append(1)
+        self.com = np.matrix(com).T
         #com has the position of Center of Mass(x, y, z)
         self.d, self.a, self.alfa, self.m = dh
         #__dh has the Denavit-Hartenberg parameters(d, a, alfa, m)
@@ -46,15 +47,15 @@ class Baxter_Link:
     def J(self):
         xx, yy, zz, xy, yz, xz = self.__inertias
         d, a, alfa, m = self.d, self.a, self.alfa, self.m
-        x, y, z = self.com
+        x, y, z. _ = map(int, self.com)
         return np.matrix([
             [(-xx+yy+zz)/2,           xy,            xz, m*x],
             [           xy, (xx-yy+zz)/2,            yz, m*y],
             [           xz,           yz, (+xx+yy-zz)/2, m*z],
-            [           mx,           my,            mz,   m]
+            [          m*x,          m*y,           m*z,   m]
         ])
 
-    def Q():
+    def Q(self):
         return np.matrix([
             [ 0, -1, 0, 0],
             [ 1,  0, 0, 0],
@@ -105,6 +106,7 @@ class Baxter_Test():
                            [0.2295, 0, 0, 0.54218]
             )
         }
+        self.n = 7
 
 
 """
