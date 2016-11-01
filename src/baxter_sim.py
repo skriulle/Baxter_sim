@@ -14,6 +14,7 @@ class Baxter_Simulation():
     def __init__(self):
         self.baxter_test = Baxter_Test()
         self.links = self.baxter_test.links
+        self.n = self.baxter_test.n
     
     def sim(self):
         p, dp, ddp = f01.function1()
@@ -31,7 +32,7 @@ class Baxter_Simulation():
                 break
         return T
 
-    def U(self, i, j, k=None, q=None):
+    def U(self, q, i, j, k=None):
         U = np.matrix(np.identity(4))
         if k is not None:
             if i < j or i < k:
@@ -48,24 +49,50 @@ class Baxter_Simulation():
 
         return U
 
+    def dK(self, i, q, dq, ddq):
+        dK = 0
+        for j in range(i, self.n+1):
+            Jj = self.links[j].J()
+            for k in range(1, j+1):
+                Ujk = self.U(q, j,k)
+                M = Ujk * Jj * Ujk.T
+                dK += M.trace() * ddq[k-1]
+
+        
+        for j in range(i, self.n+1):
+            Jj = self.links[j].J()
+            for k in range(1, j+1):
+                Uji = self.U(q, j,i)
+                dqk = dq[k-1]
+                for m in range(1, j+1):
+                    Ujkm = self.U(q, j,k,m)
+                    dqm = dq[m-1]
+                    M = Ujkm * Jj * Uji.T
+                    dK += M.trace() * dqk * dqm
+                    
+        return dK
+
     def dL_dq(self, i, q):
         dL_dq = 0
         for j in range(i, self.baxter_test.n+1):
             m = self.links[j].m
             r = self.links[j].com
-            U = self.U(j, i, q=q)
+            U = self.U(q, j, i)
             dL_dq += m*g * U * r
             
-        return dL_dq
+        return float(dL_dq)
 
     def get_torque(self, i, q, dq, ddq):
-        return self.dL_dq(i, q)
+        dK = self.dK(i, q, dq, ddq)
+        dL_dq = self.dL_dq(i, q)
+        t = dK-dL_dq
+        return t
         
 
 
     def main(self):
         self.sim()
-        print self.get_torque(2, [0,0,0,0,0,0.3,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0])
+        print self.get_torque(2, [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0])
 
 if __name__ == "__main__":
     bs = Baxter_Simulation()

@@ -45,9 +45,9 @@ class Baxter_Link:
         ])
 
     def J(self):
-        xx, yy, zz, xy, yz, xz = self.__inertias
+        xx, yy, zz, xy, yz, xz = self.__intertias
         d, a, alfa, m = self.d, self.a, self.alfa, self.m
-        x, y, z. _ = map(int, self.com)
+        x, y, z, _ = map(int, self.com)
         return np.matrix([
             [(-xx+yy+zz)/2,           xy,            xz, m*x],
             [           xy, (xx-yy+zz)/2,            yz, m*y],
