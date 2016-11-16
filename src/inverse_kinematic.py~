@@ -1,0 +1,30 @@
+#-*- coding:utf-8 -*-
+
+import numpy as np
+from numpy import cos, sin
+from baxter_link import Baxter_Link, Baxter_Test
+import function01 as f01
+import csv
+
+PI = np.pi
+
+class Inverse_Kinematic():
+    def __init__(self, links, initial_angles ,valids):
+        self.original_links = links
+        self.initial_angles = initial_angles
+        self.valids = valids
+        self.links = None
+
+
+    def valid_links(self):
+        self.links = []
+        elements = zip(self.original_links, self.initial_angles, self.valids).reverse()
+
+        matrix = np.matrix([1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1])
+        for l, a, v in elements:
+            matrix = matrix*l.get_T_Matrix(a)
+            if v:
+                self.links.append(matrix)
+            else:
+                continue
+            

@@ -3,7 +3,9 @@
 import numpy as np
 from numpy import cos, sin
 from baxter_link import Baxter_Link, Baxter_Test
+from inverse_kinematic import Inverse_Kinematic
 import function01 as f01
+import csv
 
 PI = np.pi
 g = np.array([0, 0, 9.81, 0])
@@ -11,13 +13,17 @@ FREQUENCY = 50.0 #Hz
 
 
 class Baxter_Simulation():
-    def __init__(self):
+    def __init__(self, file_tag):
         self.baxter_test = Baxter_Test()
         self.links = self.baxter_test.links
         self.n = self.baxter_test.n
+        #self.inverse_kinematic = Inverse_Kinematic(self.links, [0,0,0,0,0,0,0])
+        self.filename = file_tag
     
-    def sim(self):
-        p, dp, ddp = f01.function1()
+    def get_function(self):
+        q, dq, ddq = f01.function2(10)
+        #return [[0,0,0,0,0,0,0]], [[0,0,0,0,0,0,0]], [[0,0,0,0,0,0,0]]
+        return q, dq, ddq
             
     def T(self, start, end, q):
         T = np.matrix(np.identity(4))
@@ -25,10 +31,10 @@ class Baxter_Simulation():
             if start == end:
                 break
             elif start < end:
+                end -= 1
                 theta = q[end-1]
                 T = self.links[end].get_T_Matrix(theta) * T
-                end -= 1
-            else:#inverse matrix needs to be implemented
+            else: #inverse matrix needs to be implemented
                 break
         return T
 
@@ -58,10 +64,6 @@ class Baxter_Simulation():
                 M = Ujk * Jj * Ujk.T
                 dK += M.trace() * ddq[k-1]
 
-        
-        for j in range(i, self.n+1):
-            Jj = self.links[j].J()
-            for k in range(1, j+1):
                 Uji = self.U(q, j,i)
                 dqk = dq[k-1]
                 for m in range(1, j+1):
@@ -86,14 +88,67 @@ class Baxter_Simulation():
         dK = self.dK(i, q, dq, ddq)
         dL_dq = self.dL_dq(i, q)
         t = dK-dL_dq
-        return t
-        
+        return float(t)
 
+    def sim(self, q_v, dq_v, ddq_v):
+        t_vector = []
+        for i in range(1, self.n+1):
+            ti_vector = []
+            filename = "result/" + self.filename + "0" + str(i) + ".dat"
+            f = open(filename, 'w')
+            for t,(q, dq, ddq) in enumerate(zip(q_v, dq_v, ddq_v)):
+                v = [t/FREQUENCY, self.get_torque(i, q, dq, ddq)]
+                ti_vector.append([t/FREQUENCY, self.get_torque(i, q, dq, ddq)])
+                f.write(str(v[0]) + " " + str(v[1]) + "\n")
+      
+            f.close()
+            print i, ti_vector
+            t_vector.append(ti_vector)
+            
 
     def main(self):
-        self.sim()
-        print self.get_torque(2, [0,0,0,0,0,0,0], [0,0,0,0,0,0,0], [0,0,0,0,0,0,0])
+        #q, dq, ddq = self.get_function()
+        #self.sim(q, dq, ddq)
 
+        points = [['x', 'y', 'z']]
+        xp = []
+        yp = []
+        zp = []
+        for j in range(7):
+            i = j+1
+            #T = self.T(1, i, [0,0.4,0.4,0.4,0.4,0.4,0.4])[:,3].T
+            T = self.T(1, i, [PI,1,PI/2,PI/2-1,0.4,0.4,0.4])[:,3].T
+            T = np.array(T).reshape(-1,).tolist()
+            print T[0:3]
+            points.append(T[0:3])
+            x, y, z = T[0:3]
+            xp.append(x)
+            yp.append(y)
+            #zp.append(0)
+            zp.append(z)
+
+        print xp
+
+        f = open('some.csv', 'w')
+        writer = csv.writer(f, lineterminator='\n')
+        writer.writerows(points)
+        f.close()
+
+        from mpl_toolkits.mplot3d import Axes3D
+        import matplotlib.pyplot as plt
+
+        
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+        ax.set_xlim3d(0, 1)
+        ax.set_ylim3d(0, 1)
+        ax.set_zlim3d(0, 1)
+
+        line, = ax.plot(xp, yp, zs=np.array(zp), zdir='z')
+        plt.show()
+
+        
+        
 if __name__ == "__main__":
-    bs = Baxter_Simulation()
+    bs = Baxter_Simulation("example")
     bs.main()

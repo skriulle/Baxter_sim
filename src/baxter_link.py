@@ -37,6 +37,8 @@ class Baxter_Link:
     def get_T_Matrix(self, theta=0):
         #This function of object L(i) returns transform matrix ^(i-1)T_(i)
         d, a, alfa, m = self.d, self.a, self.alfa, self.m
+        #print d, a, alfa, m
+        #print self
         return np.matrix([
             [cos(theta), -cos(alfa)*sin(theta),  sin(alfa)*sin(theta), a*cos(theta)],
             [sin(theta),  cos(alfa)*cos(theta), -sin(alfa)*cos(theta), a*sin(theta)],
