@@ -10,6 +10,7 @@ import csv
 PI = np.pi
 g = np.array([0, 0, 9.81, 0])
 FREQUENCY = 50.0 #Hz
+sim_time = 10 #s
 
 
 class Baxter_Simulation():
@@ -31,9 +32,10 @@ class Baxter_Simulation():
             if start == end:
                 break
             elif start < end:
-                end -= 1
                 theta = q[end-1]
                 T = self.links[end].get_T_Matrix(theta) * T
+                
+                end -= 1
             else: #inverse matrix needs to be implemented
                 break
         return T
@@ -124,23 +126,22 @@ class Baxter_Simulation():
 
     def main(self):
 
-        angles = self.inverse_kinematic.make_angle()
+        angles = self.inverse_kinematic.function01(sim_time)
+        q, dq, ddq = f01.angle2acceleration(angles, sim_time)
+        self.sim(q, dq, ddq)
 
+        '''
         xp = []
         yp = []
         zp = []
-
         for angle in angles:
-            for j in range(7):
-                
-                i = j+1
-                i = 7
+            for i in range(8):
                 """
                 theta1 = 1
                 theta2 = PI-1
                 """
-                theta1, theta2 = angle
-                T = self.T(1, i, [0,theta1,0,theta2,0,0,0])[:,3].T
+                _, theta1, _2, theta2, _3, _4, _5 = angle
+                T = self.T(0, i, [0,theta1,0,theta2,0,0,0])[:,3].T
                 T = np.array(T).reshape(-1,).tolist()
                 #print T[0:3]
                 x, y, z = T[0:3]
@@ -149,9 +150,9 @@ class Baxter_Simulation():
                 #zp.append(0)
                 zp.append(z)
                 print x, z
-                
-        self.visualize([xp, yp, zp])
 
+        self.visualize([xp, yp, zp])
+        '''
 
         
 if __name__ == "__main__":

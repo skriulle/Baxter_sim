@@ -8,6 +8,27 @@ g = 9.81
 FREQUENCY = 50.0
 
 
+def angle2acceleration(angles, sim_time):
+    q = angles
+    dq = []
+    for t in xrange(int(sim_time*FREQUENCY+1)):
+        dqt = []
+        for i in xrange(7):
+            dqt.append((q[t+1][i] - q[t][i]) * FREQUENCY)
+
+        dq.append(dqt)
+
+    ddq = []
+    for t in xrange(int(sim_time*FREQUENCY)):
+        ddqt = []
+        for i in xrange(7):
+            ddqt.append((dq[t+1][i] - dq[t][i]) * FREQUENCY)
+
+        ddq.append(ddqt)
+
+    return q, dq, ddq
+    
+
 def function1(sim_time = 40.0):
     #T = 3s
     p = []
