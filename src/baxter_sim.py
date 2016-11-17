@@ -17,7 +17,7 @@ class Baxter_Simulation():
         self.baxter_test = Baxter_Test()
         self.links = self.baxter_test.links
         self.n = self.baxter_test.n
-        #self.inverse_kinematic = Inverse_Kinematic(self.links, [0,0,0,0,0,0,0])
+        self.inverse_kinematic = Inverse_Kinematic(self.links, [0,0,0,0,0,0,0])
         self.filename = file_tag
     
     def get_function(self):
@@ -104,35 +104,10 @@ class Baxter_Simulation():
             f.close()
             print i, ti_vector
             t_vector.append(ti_vector)
-            
 
-    def main(self):
-        #q, dq, ddq = self.get_function()
-        #self.sim(q, dq, ddq)
 
-        points = [['x', 'y', 'z']]
-        xp = []
-        yp = []
-        zp = []
-        for j in range(7):
-            i = j+1
-            #T = self.T(1, i, [0,0.4,0.4,0.4,0.4,0.4,0.4])[:,3].T
-            T = self.T(1, i, [PI,1,PI/2,PI/2-1,0.4,0.4,0.4])[:,3].T
-            T = np.array(T).reshape(-1,).tolist()
-            print T[0:3]
-            points.append(T[0:3])
-            x, y, z = T[0:3]
-            xp.append(x)
-            yp.append(y)
-            #zp.append(0)
-            zp.append(z)
-
-        print xp
-
-        f = open('some.csv', 'w')
-        writer = csv.writer(f, lineterminator='\n')
-        writer.writerows(points)
-        f.close()
+    def visualize(self, xyz):
+        xp, yp, zp = xyz
 
         from mpl_toolkits.mplot3d import Axes3D
         import matplotlib.pyplot as plt
@@ -141,13 +116,43 @@ class Baxter_Simulation():
         fig = plt.figure()
         ax = fig.gca(projection='3d')
         ax.set_xlim3d(0, 1)
-        ax.set_ylim3d(0, 1)
+        ax.set_ylim3d(-0.5, 0.5)
         ax.set_zlim3d(0, 1)
 
         line, = ax.plot(xp, yp, zs=np.array(zp), zdir='z')
         plt.show()
 
-        
+    def main(self):
+
+        angles = self.inverse_kinematic.make_angle()
+
+        xp = []
+        yp = []
+        zp = []
+
+        for angle in angles:
+            for j in range(7):
+                
+                i = j+1
+                i = 7
+                """
+                theta1 = 1
+                theta2 = PI-1
+                """
+                theta1, theta2 = angle
+                T = self.T(1, i, [0,theta1,0,theta2,0,0,0])[:,3].T
+                T = np.array(T).reshape(-1,).tolist()
+                #print T[0:3]
+                x, y, z = T[0:3]
+                xp.append(x)
+                yp.append(y)
+                #zp.append(0)
+                zp.append(z)
+                print x, z
+                
+        self.visualize([xp, yp, zp])
+
+
         
 if __name__ == "__main__":
     bs = Baxter_Simulation("example")
