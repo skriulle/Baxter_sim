@@ -69,26 +69,12 @@ class Inverse_Kinematic:
             #theta1 = -np.arccos((k1*k3 + k2*k4) / (k1**2 + k2**2))
             theta1 = -np.arcsin((k1*k4 - k2*k3) / (k1**2 + k2**2))
 
-            #theta1, theta2 = 0, 0
             angles.append([0,theta1_init-theta1,0,theta2_init-theta2,0,0,0])
             #angles.append([0,0,0,0,0,0,0])
             #angles.append([theta1_init-theta1, theta2_init-theta2])
-
         #print angles
         #return [[theta1_init, theta2_init]]
         return angles
 
-    def function01(self, sim_time = 10):
-        positions = []
-        for t in range(int(sim_time*FREQUENCY)+2):
-            x = 0.62
-            y = 0
-            z = 0.15*sin(2*PI*t/FREQUENCY/2.0)+0.55 #T = 2s
-            positions.append([x,y,z])
-
-        angles = self.make_angle(positions)
-        return angles
-        
-        
 
     

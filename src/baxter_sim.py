@@ -4,6 +4,7 @@ import numpy as np
 from numpy import cos, sin
 from baxter_link import Baxter_Link, Baxter_Test
 from inverse_kinematic import Inverse_Kinematic
+from experiment import *
 import function01 as f01
 import csv
 
@@ -14,16 +15,15 @@ sim_time = 10 #s
 
 
 class Baxter_Simulation():
-    def __init__(self, file_tag):
+    def __init__(self):
         self.baxter_test = Baxter_Test()
         self.links = self.baxter_test.links
         self.n = self.baxter_test.n
         self.inverse_kinematic = Inverse_Kinematic(self.links, [0,0,0,0,0,0,0])
-        self.filename = file_tag
+        self.filename = ""
     
     def get_function(self):
         q, dq, ddq = f01.function2(10)
-        #return [[0,0,0,0,0,0,0]], [[0,0,0,0,0,0,0]], [[0,0,0,0,0,0,0]]
         return q, dq, ddq
             
     def T(self, start, end, q):
@@ -126,7 +126,8 @@ class Baxter_Simulation():
 
     def main(self):
 
-        angles = self.inverse_kinematic.function01(sim_time)
+        positions, self.filename = ex01(sim_time)
+        angles = self.inverse_kinematic.make_angle(positions)
         q, dq, ddq = f01.angle2acceleration(angles, sim_time)
         self.sim(q, dq, ddq)
 
@@ -136,6 +137,7 @@ class Baxter_Simulation():
         zp = []
         for angle in angles:
             for i in range(8):
+
                 """
                 theta1 = 1
                 theta2 = PI-1
@@ -156,5 +158,5 @@ class Baxter_Simulation():
 
         
 if __name__ == "__main__":
-    bs = Baxter_Simulation("example")
+    bs = Baxter_Simulation()
     bs.main()
