@@ -9,7 +9,7 @@ FREQUENCY = 50.0
 
 
 def ex01(sim_time = 10):
-    name = "ex01"
+    name = "ex01/plot"
     positions = []
     for t in range(int(sim_time*FREQUENCY)+2):
         x = 0.62
@@ -21,7 +21,7 @@ def ex01(sim_time = 10):
 
 
 def ex02(sim_time = 10):
-    name = "ex02"
+    name = "ex02/plot"
     positions = []
     for t in range(int(sim_time*FREQUENCY)+2):
         x = 0.62
