@@ -11,7 +11,7 @@ import csv
 PI = np.pi
 g = np.array([0, 0, 9.81, 0])
 FREQUENCY = 50.0 #Hz
-sim_time = 10 #s
+sim_time = 40.0 #s
 
 
 class Baxter_Simulation():
@@ -126,7 +126,7 @@ class Baxter_Simulation():
 
     def main(self):
 
-        positions, self.filename = ex01(sim_time)
+        positions, self.filename = ex04(sim_time)
         angles = self.inverse_kinematic.make_angle(positions)
         q, dq, ddq = f01.angle2acceleration(angles, sim_time)
         self.sim(q, dq, ddq)

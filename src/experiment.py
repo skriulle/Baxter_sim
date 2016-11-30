@@ -32,3 +32,27 @@ def ex02(sim_time = 10):
     return positions, name
 
 
+def ex03(sim_time = 10):
+    name = "ex03/plot"
+    positions = []
+    for t in range(int(sim_time*FREQUENCY)+2):
+        x = 0.2*sin(2*PI*t/FREQUENCY/6.0)+0.62
+        y = 0
+        z = 0.55
+        positions.append([x,y,z])
+
+    return positions, name
+
+
+def ex04(sim_time = 10):
+    name = "ex04/plot"
+    positions = []
+    for t in range(int(sim_time*FREQUENCY)+2):
+        x = 0.15*sin(2*PI*t/FREQUENCY/6.0)+0.62
+        y = 0
+        z = 0.15*sin(2*PI*t/FREQUENCY/2.0)+0.55
+        positions.append([x,y,z])
+
+    return positions, name
+
+

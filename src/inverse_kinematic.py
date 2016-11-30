@@ -17,6 +17,16 @@ class Inverse_Kinematic:
         self.links = None                   #array
         self.valid_links()
 
+    def write_position_file(self, positions):
+        filename = "result/" + filename + "xyz" + "01" + ".dat"
+        f = open(filename, 'w')
+        for t, p in enumerate(positions):
+            x, y, z = p
+            v = [t/FREQUENCY, x, y, z]
+            f.write(str(v[0]) + " " + str(v[1]) + " " +  str(v[2]) + " " + str(v[3]) + "\n")
+        f.close()
+
+        
     def valid_links(self):
         self.links = []
         elements = zip(self.initial_angles, self.valids)
