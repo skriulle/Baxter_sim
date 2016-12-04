@@ -7,6 +7,7 @@ from inverse_kinematic import Inverse_Kinematic
 from experiment import *
 import function01 as f01
 import csv
+import time
 
 PI = np.pi
 g = np.array([0, 0, 9.81, 0])
@@ -92,6 +93,26 @@ class Baxter_Simulation():
         t = dK-dL_dq
         return float(t)
 
+    def save_trajectory(self, positions):
+        
+        positions = list(map(list, zip(*positions)))
+        print len(positions)
+        pos = {
+            0 : "x",
+            1 : "y",
+            2 : "z",
+        }
+        for (idx_vec, vec) in enumerate(positions):
+            filename = "trajectory/" + self.filename + "-" + pos[idx_vec] + ".dat"
+            print "save at : " + filename
+            f = open(filename, 'w')
+            
+            for (t, value) in enumerate(vec):
+                v = [t/FREQUENCY, value]
+                f.write(str(v[0]) + " " + str(v[1]) + "\n")
+            f.close()
+        pass
+
     def sim(self, q_v, dq_v, ddq_v):
         t_vector = []
         for i in range(1, self.n+1):
@@ -104,7 +125,25 @@ class Baxter_Simulation():
                 f.write(str(v[0]) + " " + str(v[1]) + "\n")
       
             f.close()
-            print i, ti_vector
+            #print i, ti_vector, i
+            print "i -> " + str(i) + " : at " + str(time.ctime())
+            t_vector.append(ti_vector)
+
+            
+    def sim2(self, q_v, dq_v, ddq_v):
+        t_vector = []
+        for i in range(1, self.n+1):
+            ti_vector = []
+            filename = "result/" + self.filename + "0" + str(i) + ".dat"
+            f = open(filename, 'w')
+            for t,(q, dq, ddq) in enumerate(zip(q_v, dq_v, ddq_v)):
+                v = [t/FREQUENCY, self.get_torque(i, q, dq, ddq)]
+                ti_vector.append([t/FREQUENCY, self.get_torque(i, q, dq, ddq)])
+                f.write(str(v[0]) + " " + str(v[1]) + "\n")
+      
+            f.close()
+            #print i, ti_vector, i
+            print "i -> " + str(i) + " : at " + str(time.time())
             t_vector.append(ti_vector)
 
 
@@ -123,13 +162,35 @@ class Baxter_Simulation():
 
         line, = ax.plot(xp, yp, zs=np.array(zp), zdir='z')
         plt.show()
-
+        
+        
     def main(self):
 
-        positions, self.filename = ex04(sim_time)
-        angles = self.inverse_kinematic.make_angle(positions)
-        q, dq, ddq = f01.angle2acceleration(angles, sim_time)
-        self.sim(q, dq, ddq)
+        function = {
+            0 : ex01,
+            1 : ex02,
+            2 : ex03,
+            3 : ex04,
+            4 : ex05,
+            5 : ex06,
+            6 : ex07,
+            7 : ex08,
+        }
+        function = {
+            0 : ex06,
+        }
+        for i in range(len(function)):
+            print "start  at -> " + str(time.ctime())
+            positions, self.filename = function[i](sim_time)
+            self.save_trajectory(positions)
+            
+            angles = self.inverse_kinematic.make_angle(positions)
+            q, dq, ddq = f01.angle2acceleration(angles, sim_time)
+            print self.filename
+            self.sim(q, dq, ddq)
+            print "finish at -> " + str(time.ctime())
+            
+
 
         '''
         xp = []

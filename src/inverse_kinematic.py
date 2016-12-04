@@ -70,8 +70,12 @@ class Inverse_Kinematic:
 
             k1 = x-x1
             k2 = z-z1
-            
-            theta2 = np.arccos( ((k1**2+k2**2)-(l2**2+l3**2)) / (2*l2*l3))
+
+            try:
+                ee = ((k1**2+k2**2)-(l2**2+l3**2)) / (2*l2*l3)
+                theta2 = np.arccos(ee)
+            except Warning:
+                print  ((k1**2+k2**2)-(l2**2+l3**2)) / (2*l2*l3)
             
             k3 = l2 + l3*cos(theta2)
             k4 = l3*sin(theta2)
